@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+
+import sys
+from math import *
+
+def my_h():
+    print("USAGE\n\t\t./108trigo fun a0 a1 a2....\n\n"
+          "DESCRIPTION\n\t\tfun\tfunction to be applied, "
+          "among at least \"EXP\", \"COS\", \"SIN\", \"COSH\" and \"SINH\"\n"
+          "\t\tai\tcoeficients of the matrix")
+    sys.exit(0)
+
+def identity_mat(n):
+    tab = []
+    for a in range(n):
+        tab2 = []
+        for b in range(n):
+            tab2.append(1 if b == a else 0)
+        tab.append(tab2)
+    return (tab)
+
+
+def init_mat(n, k):
+    tab = []
+    for a in range(n):
+        tab2 = []
+        for b in range(n):
+            tab2.append(k)
+        tab.append(tab2)
+    return (tab)
+
+
+def mat_mult(mat1, mat2):
+    tab = []
+    for a in range(len(mat1)):
+        tab2 = []
+        for b in range(len(mat2[0])):
+            d = 0
+            for c in range(len(mat1[0])):
+                d = d + mat1[a][c] * mat2[c][b]
+            tab2.append(d)
+        tab.append(tab2)
+    return (tab)
+
+
+def pow_mat(mat1, n):
+    tab = mat1
+    for a in range(n - 1):
+        tab = mat_mult(tab, mat1)
+    return (tab)
+
+
+def div_mat(mat1, k):
+    for a in range(len(mat1)):
+        for b in range(len(mat1[0])):
+            mat1[a][b] = mat1[a][b] / k
+    return (mat1)
+
+def add_mat(mat1, mat2):
+    tab = []
+    for a in range(len(mat1)):
+        tab2 = []
+        for b in range(len(mat1[0])):
+            tab2.append(mat1[a][b] + mat2[a][b])
+        tab.append(tab2)
+    return (tab)
+
+
+def sub_mat(mat1, mat2):
+    tab = []
+    for a in range(len(mat1)):
+        tab2 = []
+        for b in range(len(mat1[0])):
+            tab2.append(mat1[a][b] - mat2[a][b])
+        tab.append(tab2)
+    return (tab)
+
+def my_exp(tab):
+    tmp = identity_mat(len(tab))
+    for a in range(1, 18):
+        tmp = add_mat(tmp, div_mat(pow_mat(tab, a), factorial(a)))
+    return (tmp)
+
+def my_cos(tab):
+    tmp = identity_mat(len(tab))
+    for a in range(1, 17):
+        if a % 2 == 0:
+            tmp = add_mat(tmp, div_mat(pow_mat(tab, 2 * a), factorial(2 * a)))
+        else:
+            tmp = sub_mat(tmp, div_mat(pow_mat(tab, 2 * a), factorial(2 * a)))
+    return (tmp)
+
+def my_sin(tab):
+    tmp = tab
+    for a in range(1, 17):
+        if a % 2 == 0:
+            tmp = add_mat(tmp, div_mat(pow_mat(tab, 2 * a + 1), factorial(2 * a + 1)))
+        else:
+            tmp = sub_mat(tmp, div_mat(pow_mat(tab, 2 * a + 1), factorial(2 * a + 1)))
+    return (tmp)
+
+def my_cosh(tab):
+    tmp = identity_mat(len(tab))
+    for a in range(1, 17):
+        tmp = add_mat(tmp, div_mat(pow_mat(tab, 2 * a), factorial(2 * a)))
+    return (tmp)
+
+def my_sinh(tab):
+    tmp = tab
+    for a in range(1, 17):
+        tmp = add_mat(tmp, div_mat(pow_mat(tab, 2 * a + 1), factorial(2 * a + 1)))
+    return (tmp)
+
+def check_args():
+    if "-h" in sys.argv or "--help" in sys.argv:
+        my_h()
+    if len(sys.argv) <= 2 or sys.argv[1] not in ["EXP", "COS", "SIN", "COSH", "SINH"]:
+        sys.exit(84)
+    try:
+        for a in range(2, len(sys.argv)):
+            sys.argv[a] = float(sys.argv[a])
+    except ValueError:
+        print("BAD ARG %s" % (a, sys.argv[a]), file=sys.stderr)
+
+def launch_fc(tab):
+    args = ["EXP", "COS", "SIN", "COSH", "SINH"]
+    tab_fc = [my_exp, my_cos, my_sin, my_cosh, my_sinh]
+    for a in range(len(tab_fc)):
+        if sys.argv[1] == args[a]:
+            tab = tab_fc[a](tab)
+    return (tab)
+
+def aff_matrix(tab):
+    for a in range(len(tab)):
+        for b in range (len(tab[a])):
+            print("%.2f%c" % (tab[a][b], "\t" if (b != len(tab[a]) - 1) else "\n"), end="")
+
+def error_matrix():
+    a = len(sys.argv) - 2
+    b = trunc(sqrt(a))
+    if trunc(sqrt(a)) ** 2 != a:
+        sys.exit(84)
+    return (b)
+
+def tab_fonctions():
+    tab_fc = [my_exp, my_cos, my_sin, my_cosh, my_sinh]
+
+def main():
+    check_args()
+    tab = []
+    a = error_matrix()
+    for b in range(int(a)):
+        tab.append([])
+        for c in range (int(a)):
+            tab[b].append(sys.argv[b * int(a) + c + 2])
+    tab = launch_fc(tab)
+    aff_matrix(tab)
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
