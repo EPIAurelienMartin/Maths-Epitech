@@ -8,4 +8,6 @@ Grade Semester 1 : A
 Grade Semester 2 : A
 
 
-Code languages are C and Python
+Code languages are C and Python.
+
+Groupe Project realised with github.com/LouisGaspard.
